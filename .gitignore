@@ -1,0 +1,4 @@
+.vs
+*.pyc
+*.db
+config.private.json
