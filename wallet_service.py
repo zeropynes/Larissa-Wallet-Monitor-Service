@@ -33,6 +33,15 @@ class WalletManager:
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         ''')
+
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS wallet_name (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            wallet_id TEXT NOT NULL UNIQUE,
+            wallet_name TEXT NOT NULL,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        ''')
         conn.commit()
         conn.close()
 
@@ -82,12 +91,26 @@ class WalletManager:
         conn.commit()
         conn.close()
 
+    def append_wallet_name(self, wallet_id, wallet_name):
+        conn = sqlite3.connect('wallet_monitor.db')
+        cursor = conn.cursor()
+
+        cursor.execute('''
+        INSERT OR REPLACE INTO 
+            wallet_name (wallet_id, wallet_name, updated_at)
+        VALUES (?, ?, ?)
+        ''', (wallet_id, wallet_name, datetime.now()))
+
+        conn.commit()
+        conn.close()
+
     async def update_wallet_info(self):
         async with aiohttp.ClientSession() as session:
             await self.fetch_wallet_data()
             for wallet_id, wallet_name in self.wallets.items():
                 earnings = await self.get_wallet_earnings(session, wallet_id)
                 self.append_wallet_history(wallet_id, earnings)
+                self.append_wallet_name(wallet_id, wallet_name)
 
     async def run(self):
         while True:
