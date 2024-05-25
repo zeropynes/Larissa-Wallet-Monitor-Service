@@ -7,13 +7,13 @@ from datetime import datetime
 import time
 
 class WalletManager:
-    def __init__(self, config_file: str):
+    def __init__(self, my_config_file: str):
         self.token = ''
         self.wallets = {}
         if os.path.exists("config.private.json"):
             config_file = "config.private.json"
         else:
-            config_file = "config.json"
+            config_file = my_config_file
         self.load_config(config_file)
         self.initialize_db()
 
