@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+import os
 import json
 import sqlite3
 from datetime import datetime
@@ -9,6 +10,10 @@ class WalletManager:
     def __init__(self, config_file: str):
         self.token = ''
         self.wallets = {}
+        if os.path.exists("config.private.json"):
+            config_file = "config.private.json"
+        else:
+            config_file = "config.json"
         self.load_config(config_file)
         self.initialize_db()
 
